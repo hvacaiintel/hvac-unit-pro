@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>HVAC Unit Pro — hvacAI intel</title>
+<!-- PWA Meta -->
+<meta name="description" content="Convert every HVAC unit instantly — temperature, airflow, pressure, power, enthalpy and more. SI & IP. Free for HVAC engineers.">
+<meta name="theme-color" content="#0a1628">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="HVAC Unit Pro">
+<link rel="manifest" href="manifest.json">
+<!-- Apple touch icons (add real icons later) -->
+<link rel="apple-touch-icon" href="icon-192.png">
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0a1628;
+  --navy2: #0f2040;
+  --teal: #00c9b1;
+  --teal2: #00a896;
+  --tealfade: rgba(0,201,177,0.12);
+  --tealfade2: rgba(0,201,177,0.06);
+  --text: #e8f4f2;
+  --muted: #7a9e9b;
+  --card: #111f35;
+  --border: rgba(0,201,177,0.18);
+  --warn: #f59e0b;
+  --red: #ef4444;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--navy);color:var(--text);font-family:'Inter',sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* BG mesh */
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse 60% 40% at 80% 10%, rgba(0,201,177,0.07) 0%, transparent 70%),
+  radial-gradient(ellipse 40% 60% at 10% 80%, rgba(0,168,150,0.05) 0%, transparent 70%);
+  pointer-events:none;z-index:0;}
+
+.app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 0 80px;}
+
+/* HEADER */
+header{padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between;}
+.logo-wrap{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:36px;height:36px;background:var(--teal);border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.logo-icon svg{width:20px;height:20px;fill:var(--navy);}
+.logo-text{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:18px;letter-spacing:1px;}
+.logo-text span{color:var(--teal);}
+.badge{background:var(--tealfade);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--teal);font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:1px;}
+
+/* TITLE */
+.hero{padding:24px 20px 16px;}
+.hero h1{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:28px;line-height:1.1;letter-spacing:0.5px;}
+.hero h1 span{color:var(--teal);}
+.hero p{color:var(--muted);font-size:13px;margin-top:6px;}
+
+/* CATEGORY TABS */
+.tabs-scroll{overflow-x:auto;padding:0 20px;scrollbar-width:none;}
+.tabs-scroll::-webkit-scrollbar{display:none;}
+.tabs{display:flex;gap:8px;width:max-content;padding-bottom:2px;}
+.tab{padding:8px 14px;border-radius:20px;font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;letter-spacing:0.5px;cursor:pointer;border:1px solid var(--border);background:var(--tealfade2);color:var(--muted);transition:all .2s;white-space:nowrap;}
+.tab.active{background:var(--teal);color:var(--navy);border-color:var(--teal);}
+.tab:hover:not(.active){border-color:var(--teal);color:var(--teal);}
+
+/* CONVERTER PANEL */
+.panel{padding:16px 20px;}
+.cat-header{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.cat-icon{font-size:22px;}
+.cat-title{font-family:'Rajdhani',sans-serif;font-weight:700;font-size:20px;color:var(--teal);}
+
+/* UNIT SELECTOR */
+.converter-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:12px;transition:border-color .2s;}
+.converter-card:hover{border-color:rgba(0,201,177,0.35);}
+.conv-label{font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;font-family:'Rajdhani',sans-serif;font-weight:600;}
+.input-row{display:flex;gap:8px;align-items:center;}
+.num-input{flex:1;background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:16px;outline:none;transition:border-color .2s;}
+.num-input:focus{border-color:var(--teal);}
+.unit-select{background:var(--navy2);border:1px solid var(--border);border-radius:10px;padding:10px 8px;color:var(--teal);font-family:'Rajdhani',sans-serif;font-weight:600;font-size:13px;outline:none;cursor:pointer;min-width:90px;}
+.unit-select:focus{border-color:var(--teal);}
+.swap-btn{background:var(--tealfade);border:1px solid var(--border);border-radius:8px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--teal);font-size:16px;transition:all .2s;flex-shrink:0;}
+.swap-btn:hover{background:var(--teal);color:var(--navy);}
+
+.arrow-row{text-align:center;color:var(--teal);font-size:18px;margin:6px 0;}
+
+.result-box{background:var(--navy);border:1px solid var(--teal);border-radius:10px;padding:10px 14px;display:flex;align-items:baseline;gap:8px;}
+.result-val{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:500;color:var(--teal);}
+.result-unit{font-family:'Rajdhani',sans-serif;font-size:14px;color:var(--muted);font-weight:600;}
+
+/* ALL UNITS TABLE */
+.all-table{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:12px;}
+.all-table-title{padding:12px 16px;font-family:'Rajdhani',sans-serif;font-weight:700;font-size:14px;color:var(--muted);border-bottom:1px solid var(--border);letter-spacing:1px;text-transform:uppercase;}
+.all-row{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(0,201,177,0.06);}
+.all-row:last-child{border-bottom:none;}
+.all-unit{font-size:12px;color:var(--muted);font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:0.5px;}
+.all-val{font-family:'JetBrains Mono',monospace;font-size:14px;color:var(--text);}
+
+/* FOOTER NAV */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(10,22,40,0.95);backdrop-filter:blur(12px);border-top:1px solid var(--border);display:flex;justify-content:space-around;padding:10px 0 14px;z-index:100;}
+.nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:var(--muted);transition:color .2s;font-size:10px;font-family:'Rajdhani',sans-serif;font-weight:600;letter-spacing:0.5px;}
+.nav-item.active{color:var(--teal);}
+.nav-icon{font-size:20px;}
+
+/* FORMULA BAR */
+.formula-bar{background:var(--tealfade2);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:12px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);}
+.formula-bar span{color:var(--teal);}
+
+/* BRAND FOOTER */
+.brand-strip{text-align:center;padding:12px;font-family:'Rajdhani',sans-serif;font-size:12px;color:var(--muted);letter-spacing:1px;}
+.brand-strip span{color:var(--teal);}
+
+/* Animations */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.panel{animation:fadeIn .25s ease;}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <div class="logo-wrap">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z"/></svg>
+      </div>
+      <div class="logo-text">hvac<span>AI</span> intel</div>
+    </div>
+    <div class="badge">UNIT PRO</div>
+  </header>
+
+  <div class="hero">
+    <h1>HVAC <span>Unit</span> Converter</h1>
+    <p>All thermodynamic & engineering units · SI ↔ IP · Instant results</p>
+  </div>
+
+  <div class="tabs-scroll">
+    <div class="tabs" id="tabs">
+      <div class="tab active" onclick="switchCat(0)">🌡️ Temp</div>
+      <div class="tab" onclick="switchCat(1)">💨 Airflow</div>
+      <div class="tab" onclick="switchCat(2)">⚡ Power</div>
+      <div class="tab" onclick="switchCat(3)">🔵 Pressure</div>
+      <div class="tab" onclick="switchCat(4)">💨 Velocity</div>
+      <div class="tab" onclick="switchCat(5)">⚖️ Mass Flow</div>
+      <div class="tab" onclick="switchCat(6)">📦 Sp. Volume</div>
+      <div class="tab" onclick="switchCat(7)">🌊 Enthalpy</div>
+      <div class="tab" onclick="switchCat(8)">💧 Humidity</div>
+      <div class="tab" onclick="switchCat(9)">📐 Area</div>
+      <div class="tab" onclick="switchCat(10)">🔥 Heat Load</div>
+      <div class="tab" onclick="switchCat(11)">⚙️ Density</div>
+    </div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <div class="brand-strip">Built with Claude · <span>@hvacAIintel</span> · Free for HVAC Pros</div>
+
+</div>
+
+<div class="bottom-nav">
+  <div class="nav-item active"><div class="nav-icon">⇄</div>CONVERT</div>
+  <div class="nav-item"><div class="nav-icon">📋</div>ALL UNITS</div>
+  <div class="nav-item"><div class="nav-icon">ℹ️</div>FORMULAS</div>
+</div>
+
+<script>
+const cats = [
+  {
+    name:'Temperature', icon:'🌡️',
+    formula:'°C = (°F − 32) × 5/9 · K = °C + 273.15',
+    units:['°C','°F','K','°R'],
+    toBase: v => v, // base = °C
+    converts:{
+      '°C': {to: v=>v, from: v=>v},
+      '°F': {to: v=>(v-32)*5/9, from: v=>v*9/5+32},
+      'K':  {to: v=>v-273.15, from: v=>v+273.15},
+      '°R': {to: v=>(v-491.67)*5/9, from: v=>(v+273.15)*9/5+491.67-273.15*9/5},
+    }
+  },
+  {
+    name:'Airflow / Volume Flow', icon:'💨',
+    formula:'1 CFM = 0.4719 L/s = 1.699 m³/h',
+    units:['CFM','L/s','m³/h','m³/s','CMM'],
+    converts:{
+      'CFM':  {to: v=>v*0.000471947, from: v=>v/0.000471947},
+      'L/s':  {to: v=>v/1000, from: v=>v*1000},
+      'm³/h': {to: v=>v/3600, from: v=>v*3600},
+      'm³/s': {to: v=>v, from: v=>v},
+      'CMM':  {to: v=>v/60, from: v=>v*60},
+    }
+  },
+  {
+    name:'Power / Heat Flow', icon:'⚡',
+    formula:'1 kW = 3412.14 BTU/h = 0.2843 TR',
+    units:['kW','BTU/h','TR','W','kcal/h','HP','MBH'],
+    converts:{
+      'kW':     {to: v=>v*1000, from: v=>v/1000},
+      'BTU/h':  {to: v=>v*0.29307107/1000, from: v=>v/(0.29307107/1000)},
+      'TR':     {to: v=>v*3516.853, from: v=>v/3516.853},
+      'W':      {to: v=>v, from: v=>v},
+      'kcal/h': {to: v=>v*1.163, from: v=>v/1.163},
+      'HP':     {to: v=>v*745.7, from: v=>v/745.7},
+      'MBH':    {to: v=>v*293.07107, from: v=>v/293.07107},
+    }
+  },
+  {
+    name:'Pressure', icon:'🔵',
+    formula:'1 kPa = 0.145 psi = 4.015 inWG',
+    units:['Pa','kPa','bar','psi','inWG','mmWG','mmHg','inHg','atm'],
+    converts:{
+      'Pa':    {to: v=>v, from: v=>v},
+      'kPa':   {to: v=>v*1000, from: v=>v/1000},
+      'bar':   {to: v=>v*100000, from: v=>v/100000},
+      'psi':   {to: v=>v*6894.76, from: v=>v/6894.76},
+      'inWG':  {to: v=>v*249.089, from: v=>v/249.089},
+      'mmWG':  {to: v=>v*9.80665, from: v=>v/9.80665},
+      'mmHg':  {to: v=>v*133.322, from: v=>v/133.322},
+      'inHg':  {to: v=>v*3386.39, from: v=>v/3386.39},
+      'atm':   {to: v=>v*101325, from: v=>v/101325},
+    }
+  },
+  {
+    name:'Velocity / Air Speed', icon:'💨',
+    formula:'1 m/s = 196.85 ft/min = 3.6 km/h',
+    units:['m/s','ft/min','km/h','mph','knot'],
+    converts:{
+      'm/s':   {to: v=>v, from: v=>v},
+      'ft/min':{to: v=>v*0.00508, from: v=>v/0.00508},
+      'km/h':  {to: v=>v/3.6, from: v=>v*3.6},
+      'mph':   {to: v=>v*0.44704, from: v=>v/0.44704},
+      'knot':  {to: v=>v*0.514444, from: v=>v/0.514444},
+    }
+  },
+  {
+    name:'Mass Flow Rate', icon:'⚖️',
+    formula:'1 kg/s = 3600 kg/h = 7936.6 lb/h',
+    units:['kg/s','kg/h','g/s','lb/s','lb/h','lb/min'],
+    converts:{
+      'kg/s':  {to: v=>v, from: v=>v},
+      'kg/h':  {to: v=>v/3600, from: v=>v*3600},
+      'g/s':   {to: v=>v/1000, from: v=>v*1000},
+      'lb/s':  {to: v=>v*0.453592, from: v=>v/0.453592},
+      'lb/h':  {to: v=>v*0.453592/3600, from: v=>v/0.453592*3600},
+      'lb/min':{to: v=>v*0.453592/60, from: v=>v/0.453592*60},
+    }
+  },
+  {
+    name:'Specific Volume', icon:'📦',
+    formula:'1 m³/kg = 16.018 ft³/lb',
+    units:['m³/kg','ft³/lb','L/kg','cm³/g'],
+    converts:{
+      'm³/kg': {to: v=>v, from: v=>v},
+      'ft³/lb':{to: v=>v*0.0624280, from: v=>v/0.0624280},
+      'L/kg':  {to: v=>v/1000, from: v=>v*1000},
+      'cm³/g': {to: v=>v/1000, from: v=>v*1000},
+    }
+  },
+  {
+    name:'Enthalpy', icon:'🌊',
+    formula:'1 kJ/kg = 0.4299 BTU/lb',
+    units:['kJ/kg','BTU/lb','kcal/kg','J/g'],
+    converts:{
+      'kJ/kg':  {to: v=>v, from: v=>v},
+      'BTU/lb': {to: v=>v*2.326, from: v=>v/2.326},
+      'kcal/kg':{to: v=>v*4.1868, from: v=>v/4.1868},
+      'J/g':    {to: v=>v, from: v=>v},
+    }
+  },
+  {
+    name:'Humidity Ratio / RH', icon:'💧',
+    formula:'1 g/kg = 7 gr/lb (approx)',
+    units:['g/kg','gr/lb','kg/kg','lb/lb'],
+    converts:{
+      'g/kg':  {to: v=>v/1000, from: v=>v*1000},
+      'gr/lb': {to: v=>v*0.0001, from: v=>v/0.0001}, // gr/lb → kg/kg: ×0.0001
+      'kg/kg': {to: v=>v, from: v=>v},
+      'lb/lb': {to: v=>v, from: v=>v},
+    }
+  },
+  {
+    name:'Area / Duct Cross-section', icon:'📐',
+    formula:'1 m² = 10.764 ft² = 1550 in²',
+    units:['m²','ft²','in²','cm²','mm²'],
+    converts:{
+      'm²':  {to: v=>v, from: v=>v},
+      'ft²': {to: v=>v*0.092903, from: v=>v/0.092903},
+      'in²': {to: v=>v*0.00064516, from: v=>v/0.00064516},
+      'cm²': {to: v=>v/10000, from: v=>v*10000},
+      'mm²': {to: v=>v/1000000, from: v=>v*1000000},
+    }
+  },
+  {
+    name:'Heat Load / Energy', icon:'🔥',
+    formula:'1 kWh = 3412.14 BTU = 860 kcal',
+    units:['kWh','BTU','MJ','kcal','Wh','therm'],
+    converts:{
+      'kWh':   {to: v=>v*3600000, from: v=>v/3600000},
+      'BTU':   {to: v=>v*1055.056, from: v=>v/1055.056},
+      'MJ':    {to: v=>v*1000000, from: v=>v/1000000},
+      'kcal':  {to: v=>v*4186.8, from: v=>v/4186.8},
+      'Wh':    {to: v=>v*3600, from: v=>v/3600},
+      'therm': {to: v=>v*105480400, from: v=>v/105480400},
+    }
+  },
+  {
+    name:'Density', icon:'⚙️',
+    formula:'Air @ 20°C = 1.204 kg/m³ = 0.0752 lb/ft³',
+    units:['kg/m³','lb/ft³','g/L','g/cm³','kg/L'],
+    converts:{
+      'kg/m³': {to: v=>v, from: v=>v},
+      'lb/ft³':{to: v=>v*16.0185, from: v=>v/16.0185},
+      'g/L':   {to: v=>v, from: v=>v},
+      'g/cm³': {to: v=>v*1000, from: v=>v/1000},
+      'kg/L':  {to: v=>v*1000, from: v=>v/1000},
+    }
+  },
+];
+
+let currentCat = 0;
+let fromUnit = null;
+let toUnit = null;
+
+function fmt(v){
+  if(isNaN(v)||!isFinite(v)) return '—';
+  if(Math.abs(v)===0) return '0';
+  if(Math.abs(v)<0.0001) return v.toExponential(4);
+  if(Math.abs(v)>=100000) return v.toExponential(4);
+  const d = Math.abs(v)>=100?2:Math.abs(v)>=1?4:6;
+  return parseFloat(v.toFixed(d)).toString();
+}
+
+function convert(val, from, to, cat){
+  const c = cat.converts;
+  const base = c[from].to(val);
+  return c[to].from(base);
+}
+
+function renderPanel(){
+  const cat = cats[currentCat];
+  const units = cat.units;
+  if(!fromUnit || !units.includes(fromUnit)) fromUnit = units[0];
+  if(!toUnit || !units.includes(toUnit) || toUnit===fromUnit) toUnit = units[1] || units[0];
+
+  const allRows = units.filter(u=>u!==fromUnit).map(u=>{
+    return `<div class="all-row"><span class="all-unit">${u}</span><span class="all-val" id="ar_${u.replace(/[^a-z0-9]/gi,'_')}">—</span></div>`;
+  }).join('');
+
+  const unitOpts1 = units.map(u=>`<option value="${u}" ${u===fromUnit?'selected':''}>${u}</option>`).join('');
+  const unitOpts2 = units.map(u=>`<option value="${u}" ${u===toUnit?'selected':''}>${u}</option>`).join('');
+
+  document.getElementById('panel').innerHTML = `
+    <div class="cat-header">
+      <span class="cat-icon">${cat.icon}</span>
+      <span class="cat-title">${cat.name}</span>
+    </div>
+    <div class="formula-bar">Formula: <span>${cat.formula}</span></div>
+    <div class="converter-card">
+      <div class="conv-label">Input Value</div>
+      <div class="input-row">
+        <input class="num-input" type="number" id="inVal" value="1" oninput="doConvert()" step="any" inputmode="decimal">
+        <select class="unit-select" id="fromSel" onchange="fromUnit=this.value;renderPanel();">${unitOpts1}</select>
+        <div class="swap-btn" onclick="swapUnits()">⇄</div>
+      </div>
+    </div>
+    <div class="arrow-row">▼</div>
+    <div class="converter-card">
+      <div class="conv-label">Result</div>
+      <div class="input-row">
+        <div class="result-box" style="flex:1">
+          <span class="result-val" id="resVal">—</span>
+          <span class="result-unit" id="resUnit">${toUnit}</span>
+        </div>
+        <select class="unit-select" id="toSel" onchange="toUnit=this.value;doConvert();">${unitOpts2}</select>
+      </div>
+    </div>
+    <div class="all-table">
+      <div class="all-table-title">All conversions from ${fromUnit}</div>
+      ${allRows}
+    </div>
+  `;
+  doConvert();
+}
+
+function doConvert(){
+  const cat = cats[currentCat];
+  const val = parseFloat(document.getElementById('inVal')?.value);
+  const from = document.getElementById('fromSel')?.value || fromUnit;
+  const to = document.getElementById('toSel')?.value || toUnit;
+  fromUnit = from; toUnit = to;
+  if(isNaN(val)){
+    document.getElementById('resVal').textContent='—';
+    return;
+  }
+  const res = convert(val, from, to, cat);
+  document.getElementById('resVal').textContent = fmt(res);
+  document.getElementById('resUnit').textContent = to;
+
+  // All rows
+  cat.units.filter(u=>u!==from).forEach(u=>{
+    const r = convert(val, from, u, cat);
+    const el = document.getElementById('ar_'+u.replace(/[^a-z0-9]/gi,'_'));
+    if(el) el.textContent = fmt(r)+' '+u;
+  });
+
+  // Update all-table title
+  const tt = document.querySelector('.all-table-title');
+  if(tt) tt.textContent = `All conversions from ${from}`;
+}
+
+function swapUnits(){
+  const tmp = fromUnit;
+  fromUnit = toUnit;
+  toUnit = tmp;
+  renderPanel();
+}
+
+function switchCat(i){
+  currentCat = i;
+  fromUnit = null; toUnit = null;
+  document.querySelectorAll('.tab').forEach((t,idx)=>t.classList.toggle('active',idx===i));
+  renderPanel();
+}
+
+renderPanel();
+
+// Register Service Worker for PWA
+if('serviceWorker' in navigator){
+  window.addEventListener('load', ()=>{
+    navigator.serviceWorker.register('sw.js')
+      .then(reg => console.log('SW registered:', reg.scope))
+      .catch(err => console.log('SW failed:', err));
+  });
+}
+</script>
+</body>
+</html>
