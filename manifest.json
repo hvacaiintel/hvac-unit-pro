@@ -1,7 +1,7 @@
 {
   "name": "HVAC Unit Pro — hvacAI intel",
   "short_name": "HVAC Unit Pro",
-  "description": "Convert every HVAC unit instantly — temperature, airflow, pressure, power, enthalpy and more. SI & IP. Free for HVAC engineers.",
+  "description": "Convert every HVAC unit instantly. Temperature, airflow, pressure, power, enthalpy and more. SI and IP. Free for HVAC engineers.",
   "start_url": "/hvac-unit-pro/index.html",
   "display": "standalone",
   "background_color": "#0a1628",
@@ -12,50 +12,28 @@
   "categories": ["utilities", "productivity", "education"],
   "icons": [
     {
-      "src": "icon-172.png",
-      "sizes": "172x172",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icon-96.png",
-      "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icon-128.png",
-      "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "maskable any"
-    },
-    {
-      "src": "icon-192.png",
+      "src": "/hvac-unit-pro/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "maskable any"
+      "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "/hvac-unit-pro/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/hvac-unit-pro/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "maskable any"
-    }
-  ],
-  "screenshots": [
-    {
-      "src": "screenshot-1.png",
-      "sizes": "1080x1920",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Temperature Converter"
+      "purpose": "any"
     },
     {
-      "src": "screenshot-2.png",
-      "sizes": "1080x1920",
+      "src": "/hvac-unit-pro/icon-512.png",
+      "sizes": "512x512",
       "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Airflow & Pressure Converter"
+      "purpose": "maskable"
     }
   ]
 }
