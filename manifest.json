@@ -12,8 +12,8 @@
   "categories": ["utilities", "productivity", "education"],
   "icons": [
     {
-      "src": "icon-72.png",
-      "sizes": "72x72",
+      "src": "icon-172.png",
+      "sizes": "172x172",
       "type": "image/png",
       "purpose": "maskable any"
     },
