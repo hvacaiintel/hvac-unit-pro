@@ -1,4 +1,5 @@
 {
+  "id": "/hvac-unit-pro/",
   "name": "HVAC Unit Pro — hvacAI intel",
   "short_name": "HVAC Unit Pro",
   "description": "Convert every HVAC unit instantly. Temperature, airflow, pressure, power, enthalpy and more. SI and IP. Free for HVAC engineers.",
@@ -34,6 +35,15 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/hvac-unit-pro/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "HVAC Unit Pro — Temperature Converter"
     }
   ]
 }
